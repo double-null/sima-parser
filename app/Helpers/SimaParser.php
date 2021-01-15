@@ -11,7 +11,7 @@ class SimaParser extends WebTraveler
     public function getCategories()
     {
         $crawler = new Crawler($this->request());
-        $categories = $crawler->filter('.novelty-item_title a')->each(
+        return $crawler->filter('.novelty-item_title a')->each(
             function (Crawler $node) {
                 $url = $this->baseUrl.$node->attr('href');
                 $crawler = new Crawler($this->setUrl($url)->request());
@@ -30,7 +30,6 @@ class SimaParser extends WebTraveler
                 ];
             }
         );
-        var_dump($categories);
     }
 
     public function getProductLinks()
