@@ -11,6 +11,31 @@ class SimaParser extends WebTraveler
     public function getCategories()
     {
         $crawler = new Crawler($this->request());
+        return $crawler->filter('.category-wrapper')->each(
+            function (Crawler $node) {
+                return [
+                    'main_category' => [
+                        [
+                            'name' => $node->filter('.novelty-item_title a')->text(),
+                            'link' => $node->filter('.novelty-item_title a')->attr('href'),
+                        ],
+                    ],
+                    'sub_categories' => $node->filter('.novelty-item_category a.link')->each(
+                        function (Crawler $node) {
+                            return [
+                                'name' => $node->text(),
+                                'link' => $node->attr('href'),
+                            ];
+                        }
+                    ),
+                ];
+            }
+        );
+    }
+
+    public function getCategoriesBC()
+    {
+        $crawler = new Crawler($this->request());
         return $crawler->filter('.novelty-item_title a')->each(
             function (Crawler $node) {
                 $url = $this->baseUrl.$node->attr('href');

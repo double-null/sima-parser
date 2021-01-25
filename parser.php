@@ -5,12 +5,39 @@ ini_set('max_execution_time', 300);
 require_once './vendor/autoload.php';
 
 use App\Helpers\SimaParser;
+use App\Adapters\CategoryAdapter;
+
+$db = new Medoo\Medoo(database());
 
 $parser = new SimaParser();
 
-$domain = 'https://www.sima-land.ru/catalog/';
+if (!$db->count('category_links', '*')) {
+    // Парсинг списка категорий из каталога
+    $domain = 'https://www.sima-land.ru/catalog/';
+    $categories = $parser->setUrl($domain)->getCategories();
+    foreach ($categories as $category) {
+        $structuredData = CategoryAdapter::factory()
+            ->setData($category['main_category'])
+            ->run();
+        $db->insert('category_links', $structuredData['links']);
+        $db->insert('category_shop', $structuredData['data']);
+        $category_id = $db->id();
+        $structuredData = CategoryAdapter::factory()
+            ->setData($category['sub_categories'])
+            ->setParent($category_id)
+            ->run();
+        $db->insert('category_links', $structuredData['links']);
+        $db->insert('category_shop', $structuredData['data']);
+    }
+} else {
+    $category_links = $db->select('category_links', '*', [
+        'scanned' => 0,
+        'LIMIT' => 10,
+    ]);
+    var_dump($category_links);
+    die;
+}
 
-$parser->setUrl($domain)->getCategories();
 
 /*
 $categoryUrl = 'https://www.sima-land.ru/sale/detskie-tyubingi-i-naduvnye-sanki/?catalog=filter&c_id=50841&per-page=20&sort=price&viewtype=list';
