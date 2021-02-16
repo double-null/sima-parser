@@ -8,9 +8,10 @@ class SimaParser extends WebTraveler
 {
     public $baseUrl = 'https://www.sima-land.ru';
 
-    public function getCategories()
+    public function getHighLevelCategories()
     {
-        $crawler = new Crawler($this->request());
+        $url = $this->baseUrl.'/catalog/';
+        $crawler = new Crawler($this->setUrl($url)->request());
         return $crawler->filter('.category-wrapper')->each(
             function (Crawler $node) {
                 return [

@@ -5,16 +5,58 @@ ini_set('max_execution_time', 300);
 require_once './vendor/autoload.php';
 
 use App\Helpers\SimaParser;
-use App\Adapters\CategoryAdapter;
+use App\Adapters\{CategoryAdapter,ShopCategoryAdapter};
 
 $db = new Medoo\Medoo(database());
 
 $parser = new SimaParser();
 
 if (!$db->count('category_links', '*')) {
+    $category = ShopCategoryAdapter::factory()->setCategory('SimaLand')->run();
+    $db->insert('category_shop', $category);
+    $rootCategoryId = $db->id();
+    $db->insert('category_links', [
+        'alien_id' => $rootCategoryId,
+        'link' => '/catalog/',
+        'scanned' => 1,
+    ]);
+    $categories = $parser->getHighLevelCategories();
+    foreach ($categories as $category) {
+        $categoryObject = ShopCategoryAdapter::factory()
+            ->setParent($rootCategoryId)
+            ->setCategory($category['main_category'][0]['name'])
+            ->run();
+        $db->insert('category_shop', $categoryObject);
+        $mainCategoryId = $db->id();
+        $db->insert('category_links', [
+            'alien_id' => $mainCategoryId,
+            'link' => $category['main_category'][0]['link'],
+            'scanned' => 1,
+        ]);
+        foreach ($category['sub_categories'] as $subCategory) {
+            $categoryObject = ShopCategoryAdapter::factory()
+                ->setParent($rootCategoryId)
+                ->setCategory($subCategory['name'])
+                ->run();
+            $db->insert('category_shop', $categoryObject);
+            $categoryId = $db->id();
+            $db->insert('category_links', [
+                'alien_id' => $categoryId,
+                'link' => $subCategory['link'],
+                'scanned' => 0,
+            ]);
+        }
+    }
+} else {
+    echo 1;
+}
+
+die;
+/*
     // Парсинг списка категорий из каталога
     $domain = 'https://www.sima-land.ru/catalog/';
     $categories = $parser->setUrl($domain)->getCategories();
+
     foreach ($categories as $category) {
         $structuredData = CategoryAdapter::factory()
             ->setData($category['main_category'])

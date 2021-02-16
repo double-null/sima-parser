@@ -6,6 +6,7 @@ $db = new Medoo\Medoo(database());
 
 $db->create('category_links',[
     "id" => ["INT", "NOT NULL", "AUTO_INCREMENT", "PRIMARY KEY"],
+    "alien_id" => ["INT", "NOT NULL"],
     "link" => ["VARCHAR(255)", "NOT NULL"],
     "scanned" => ["TINYINT(1)", "NOT NULL"],
 ]);
@@ -15,5 +16,7 @@ $db->create('product_links',[
     "link" => ["VARCHAR(255)", "NOT NULL"],
     "scanned" => ["TINYINT(1)", "NOT NULL"],
 ]);
+
+
 
 echo "Done...";
