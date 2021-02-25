@@ -5,7 +5,7 @@ ini_set('max_execution_time', 300);
 require_once './vendor/autoload.php';
 
 use App\Helpers\SimaParser;
-use App\Adapters\{CategoryAdapter,ShopCategoryAdapter};
+use App\Adapters\ShopCategoryAdapter;
 
 $db = new Medoo\Medoo(database());
 
@@ -35,7 +35,7 @@ if (!$db->count('category_links', '*')) {
         ]);
         foreach ($category['sub_categories'] as $subCategory) {
             $categoryObject = ShopCategoryAdapter::factory()
-                ->setParent($rootCategoryId)
+                ->setParent($mainCategoryId)
                 ->setCategory($subCategory['name'])
                 ->run();
             $db->insert('category_shop', $categoryObject);
@@ -48,47 +48,23 @@ if (!$db->count('category_links', '*')) {
         }
     }
 } else {
-    echo 1;
-}
+    if (!$db->count('category_links', '*', ['scanned' => 0])) echo 'DONE';
 
-die;
-/*
-    // Парсинг списка категорий из каталога
-    $domain = 'https://www.sima-land.ru/catalog/';
-    $categories = $parser->setUrl($domain)->getCategories();
-
-    foreach ($categories as $category) {
-        $structuredData = CategoryAdapter::factory()
-            ->setData($category['main_category'])
+    $category = $db->get('category_links', '*', ['scanned' => 0]);
+    $db->update('category_links', ['scanned' => 1], ['id' => $category['id']]);
+    $subCategories = SimaParser::factory()
+        ->setSegments($category['link'])
+        ->getLowLevelCategories();
+    foreach ($subCategories as $subCategory) {
+        $categoryObject = ShopCategoryAdapter::factory()
+            ->setParent($category['alien_id'])
+            ->setCategory($subCategory['name'])
             ->run();
-        $db->insert('category_links', $structuredData['links']);
-        $db->insert('category_shop', $structuredData['data']);
-        $category_id = $db->id();
-        $structuredData = CategoryAdapter::factory()
-            ->setData($category['sub_categories'])
-            ->setParent($category_id)
-            ->run();
-        $db->insert('category_links', $structuredData['links']);
-        $db->insert('category_shop', $structuredData['data']);
+        $db->insert('category_shop', $categoryObject);
+        $db->insert('category_links', [
+            'alien_id' => $db->id(),
+            'link' => $subCategory['link'],
+            'scanned' => 0,
+        ]);
     }
-} else {
-    $category_links = $db->select('category_links', '*', [
-        'scanned' => 0,
-        'LIMIT' => 10,
-    ]);
-    var_dump($category_links);
-    die;
 }
-
-
-/*
-$categoryUrl = 'https://www.sima-land.ru/sale/detskie-tyubingi-i-naduvnye-sanki/?catalog=filter&c_id=50841&per-page=20&sort=price&viewtype=list';
-$parser->setUrl($categoryUrl)->getProductLinks();
-
-$productUrl = 'https://www.sima-land.ru/2351964/oblozhka-dlya-medicinskoy-karty-zvezdy/';
-$productUrl = 'https://www.sima-land.ru/1773277/igrushka-dlya-igry-v-pesochnice-8-vidov-miks/';
-$productUrl = 'https://www.sima-land.ru/3698255/interaktivnaya-sobaka-lyubimyy-schenok-hodit-laet-poet-pesenku-vilyaet-hvostom-3/';
-
-$products = $parser->setUrl($productUrl)->getProduct();
-*/
-
