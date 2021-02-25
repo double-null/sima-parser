@@ -38,7 +38,7 @@ class CategoryAdapter
                 'meta_title' => $item['name'],
                 'meta_description' => $item['name'],
                 'type' => 0,
-                'status' => 1,
+                'status' => 0,
             ];
             $links[] = [
                 'link' => $item['link'],

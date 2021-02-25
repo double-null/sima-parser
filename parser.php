@@ -16,7 +16,8 @@ if (!$db->count('category_links', '*')) {
     $db->insert('category_shop', $category);
     $rootCategoryId = $db->id();
     $db->insert('category_links', [
-        'alien_id' => $rootCategoryId,
+        'donor_id' => 0,
+        'recepient_id' => $rootCategoryId,
         'link' => '/catalog/',
         'scanned' => 1,
     ]);
@@ -29,7 +30,8 @@ if (!$db->count('category_links', '*')) {
         $db->insert('category_shop', $categoryObject);
         $mainCategoryId = $db->id();
         $db->insert('category_links', [
-            'alien_id' => $mainCategoryId,
+            'donor_id' => $category['main_category'][0]['id'],
+            'recepient_id' => $mainCategoryId,
             'link' => $category['main_category'][0]['link'],
             'scanned' => 1,
         ]);
@@ -39,18 +41,18 @@ if (!$db->count('category_links', '*')) {
                 ->setCategory($subCategory['name'])
                 ->run();
             $db->insert('category_shop', $categoryObject);
-            $categoryId = $db->id();
             $db->insert('category_links', [
-                'alien_id' => $categoryId,
+                'donor_id' => $subCategory['id'],
+                'recepient_id' => $db->id(),
                 'link' => $subCategory['link'],
                 'scanned' => 0,
             ]);
         }
     }
-} else {
-    if (!$db->count('category_links', '*', ['scanned' => 0])) echo 'DONE';
-
+} /*elseif ($db->count('category_links', '*', ['scanned' => 0])) {
+    //Парсинг категорий нижних уровней
     $category = $db->get('category_links', '*', ['scanned' => 0]);
+    var_dump($category);
     $db->update('category_links', ['scanned' => 1], ['id' => $category['id']]);
     $subCategories = SimaParser::factory()
         ->setSegments($category['link'])
@@ -67,4 +69,11 @@ if (!$db->count('category_links', '*')) {
             'scanned' => 0,
         ]);
     }
+} */else {
+    $category = $db->get('category_links', '*', ['scanned' => 0]);
+    $productLinks = $parser
+        ->setSegments($category['link'])
+        ->getProductLinks($category['id']);
+    //echo 1;
+    //$category = $db
 }

@@ -2,6 +2,8 @@
 
 namespace App\Adapters;
 
+use App\Helpers\LettersConverter;
+
 class ShopCategoryAdapter
 {
     private $categoryName;
@@ -28,7 +30,7 @@ class ShopCategoryAdapter
     {
         return [
             'name' => $this->categoryName,
-            'slug' => 'slug',
+            'slug' => LettersConverter::run($this->categoryName),
             'parent_id' => $this->parent,
             'icon' => '',
             'meta_title' => $this->categoryName,
