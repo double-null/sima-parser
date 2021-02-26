@@ -2,10 +2,8 @@
 
 require_once './vendor/autoload.php';
 
-use App\Actions\CategoryAction;
+use App\Actions\{CategoryAction, ProductAction};
 use App\Adapters\ShopCategoryAdapter;
-use App\Adapters\TmpCategoryAdapter;
-use App\Helpers\SimaParser;
 use Medoo\Medoo;
 
 $db = new Medoo(database());
@@ -30,24 +28,8 @@ switch ($vector['action']) {
     case 'import_categories':
         CategoryAction::factory($vector['id'], $vector['progress'])->importCategories();
         break;
-}
-die;
-if ($vector['action'] == 'creation_categories') {
-
-}
-
-if ($vector['action'] == 'import_categories') {
-    $level = $vector['progress'];
-    $categories = $db->select('category_tmp', '*', ['level' => $level]);
-    foreach ($categories as $category) {
-        $categoryObject = ShopCategoryAdapter::factory()
-            ->setCategory($category['name'])
-            ->setParent(1);
-        var_dump($categoryObject);
-        die;
-    }
-
-    //var_dump($categories);
+    case 'import_products':
+        ProductAction::factory($vector['id'], $vector['progress'])->importProducts();
 }
 
 echo "Done...";

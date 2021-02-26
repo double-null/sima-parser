@@ -20,10 +20,19 @@ $db->create('category_tmp', [
     'path' => ['VARCHAR(255)', 'NOT NULL'],
 ]);
 
-$db->insert('sima_parser', [
-    'action' => 'creation_root_category',
-    'progress' => 0,
-    'stopped' => 0,
+$db->create('sima_products', [
+    'id' => ['INT', 'NOT NULL', 'AUTO_INCREMENT', 'PRIMARY KEY'],
+    'local_id' => ['INT', 'NOT NULL'],
+    'alien_id' => ['INT', 'NOT NULL'],
+    'name' => ['VARCHAR(255)', 'NOT NULL'],
+    'description' => ['VARCHAR(255)', 'NOT NULL']
+]);
+
+$db->create('sima_options', [
+    'id' => ['INT', 'NOT NULL', 'AUTO_INCREMENT', 'PRIMARY KEY'],
+    'local_id' => ['INT', 'NOT NULL'],
+    'alien_id' => ['INT', 'NOT NULL'],
+    'name' => ['VARCHAR(255)', 'NOT NULL'],
 ]);
 
 $db->insert('sima_parser', [
@@ -34,6 +43,12 @@ $db->insert('sima_parser', [
 
 $db->insert('sima_parser', [
     'action' => 'import_categories',
+    'progress' => 1,
+    'stopped' => 0,
+]);
+
+$db->insert('sima_parser', [
+    'action' => 'import_products',
     'progress' => 1,
     'stopped' => 0,
 ]);
