@@ -21,6 +21,7 @@ class TmpCategoryAdapter
         $out = [];
         foreach ($this->categories as $category) {
             $out[] = [
+                'local_id' => 0,
                 'alien_id' => $category->id,
                 'name' => $category->name,
                 'level' => $category->level,

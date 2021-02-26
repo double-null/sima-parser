@@ -4,7 +4,10 @@
         "psr-4": {
             "App\\": "app"
         },
-        "files": ["settings/database.php"]
+        "files": [
+            "settings/main.php",
+            "settings/database.php"
+        ]
     },
     "require": {
         "catfan/medoo": "^1.7",
