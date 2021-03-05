@@ -7,7 +7,7 @@ use App\Adapters\ProductAdapter;
 use App\Helpers\SimaParser;
 use Medoo\Medoo;
 
-class ProductAction
+class ParserAction
 {
     protected $id;
 
@@ -57,8 +57,6 @@ class ProductAction
     {
         $page = $this->progress;
         $attributes = $this->provider->getAttributes($page);
-        var_dump($attributes);
-        die;
         if($attributes->status == 401) die;
         if($attributes->status != 404) {
             $attributeObject = AttributeAdapter::factory()
@@ -79,7 +77,26 @@ class ProductAction
 
     public function importAttributeValues()
     {
-
+        $page = $this->progress;
+        $options = $this->provider->getAttributeValues($page);
+        var_dump($options);
+        die;
+        if($attributes->status == 401) die;
+        if($attributes->status != 404) {
+            $attributeObject = AttributeAdapter::factory()
+                ->setAttributes($attributes)
+                ->run();
+            $this->db->insert('sima_attributes', $attributeObject);
+            $this->db->update('sima_parser',
+                ['progress' => ++$page],
+                ['id' => $this->id]
+            );
+        } else {
+            $this->db->update('sima_parser',
+                ['stopped' => 1],
+                ['id' => $this->id]
+            );
+        }
     }
 
     /**

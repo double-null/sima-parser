@@ -69,6 +69,22 @@ class SimaParser extends WebTraveler
             "Authorization: Bearer {$this->token}",
             "Content-Type: application/json",
         ];
+        $url = $this->apiUrl.'/attribute?p='.$page;
+        $products = $this->setHeaders($headers)
+            ->deactivePost()
+            ->offResponceHeaders()
+            ->setUrl($url)
+            ->request();
+        return json_decode($products);
+    }
+
+    public function getAttributeValues($page = 1)
+    {
+        $headers = [
+            "Accept: application/vnd.goa.error",
+            "Authorization: Bearer {$this->token}",
+            "Content-Type: application/json",
+        ];
         $url = $this->apiUrl.'/option?p='.$page;
         $products = $this->setHeaders($headers)
             ->deactivePost()
@@ -76,5 +92,11 @@ class SimaParser extends WebTraveler
             ->setUrl($url)
             ->request();
         return json_decode($products);
+    }
+
+
+    public function getProductAttributes()
+    {
+
     }
 }

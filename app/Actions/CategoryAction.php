@@ -42,7 +42,7 @@ class CategoryAction
         ], ['id' => $this->id]);
     }
 
-    public function createCategories()
+    public function importCategories()
     {
         $page = $this->progress;
         $categories = $this->provider->getCategories($page);
@@ -51,7 +51,7 @@ class CategoryAction
             $tmpCategories = TmpCategoryAdapter::factory()
                 ->setCategories($categories)
                 ->run();
-            $this->db->insert('category_tmp', $tmpCategories);
+            $this->db->insert('sima_categories', $tmpCategories);
             $this->db->update('sima_parser',
                 ['progress' => ++$page],
                 ['id' => $this->id]
@@ -64,6 +64,7 @@ class CategoryAction
         }
     }
 
+    /*
     public function importCategories()
     {
         $level = $this->progress;
@@ -94,4 +95,5 @@ class CategoryAction
         }
         $this->db->update('sima_parser', ['progress' => ++$level], ['id' => $this->id]);
     }
+    */
 }
