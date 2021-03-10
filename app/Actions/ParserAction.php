@@ -3,7 +3,9 @@
 namespace App\Actions;
 
 use App\Adapters\AttributeAdapter;
+use App\Adapters\AttributeValueAdapter;
 use App\Adapters\ProductAdapter;
+use App\Adapters\ProductAttributeAdapter;
 use App\Helpers\SimaParser;
 use Medoo\Medoo;
 
@@ -79,14 +81,12 @@ class ParserAction
     {
         $page = $this->progress;
         $options = $this->provider->getAttributeValues($page);
-        var_dump($options);
-        die;
-        if($attributes->status == 401) die;
-        if($attributes->status != 404) {
-            $attributeObject = AttributeAdapter::factory()
-                ->setAttributes($attributes)
+        if($options->status == 401) die;
+        if($options->status != 404) {
+            $attrValueObject = AttributeValueAdapter::factory()
+                ->setValues($options)
                 ->run();
-            $this->db->insert('sima_attributes', $attributeObject);
+            $this->db->insert('sima_attribute_values', $attrValueObject);
             $this->db->update('sima_parser',
                 ['progress' => ++$page],
                 ['id' => $this->id]
@@ -100,10 +100,27 @@ class ParserAction
     }
 
     /**
-     * Получение связей Атрибут-значение
+     * Получение связей Атрибут-товар
      */
     public function importProductAttributes()
     {
-
+        $page = $this->progress;
+        $pAttributes = $this->provider->getProductAttributes($page);
+        if($pAttributes->status == 401) die;
+        if($pAttributes->status != 404) {
+            $adaptData = ProductAttributeAdapter::factory()
+                ->setData($pAttributes)
+                ->run();
+            $this->db->insert('sima_product_attributes', $adaptData);
+            $this->db->update('sima_parser',
+                ['progress' => ++$page],
+                ['id' => $this->id]
+            );
+        } else {
+            $this->db->update('sima_parser',
+                ['stopped' => 1],
+                ['id' => $this->id]
+            );
+        }
     }
 }

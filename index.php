@@ -3,13 +3,9 @@
 require_once './vendor/autoload.php';
 
 use App\Actions\{CategoryAction, ParserAction};
-use App\Adapters\ShopCategoryAdapter;
 use Medoo\Medoo;
 
 $db = new Medoo(database());
-
-//$parser = new SimaParser();
-//$parser->getToken();
 
 $vector = $db->get('sima_parser', '*', ['stopped' => 0]);
 
@@ -29,6 +25,9 @@ switch ($vector['action']) {
         break;
     case 'import_attribute_values':
         ParserAction::factory($vector['id'], $vector['progress'])->importAttributeValues();
+        break;
+    case 'import_product_attributes':
+        ParserAction::factory($vector['id'], $vector['progress'])->importProductAttributes();
         break;
 }
 

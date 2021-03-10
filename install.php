@@ -49,9 +49,9 @@ $db->create('sima_attribute_values', [
 
 $db->create('sima_product_attributes', [
     'id' => ['INT', 'NOT NULL', 'AUTO_INCREMENT', 'PRIMARY KEY'],
-    'local_id' => ['INT', 'NOT NULL'],
-    'alien_id' => ['INT', 'NOT NULL'],
-    'name' => ['VARCHAR(255)', 'NOT NULL'],
+    'attribute_id' => ['INT', 'NOT NULL'],
+    'product_id' => ['INT', 'NOT NULL'],
+    'value_id' => ['INT', 'NOT NULL'],
 ]);
 
 $db->insert('sima_parser', [
