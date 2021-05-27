@@ -8,7 +8,7 @@ use Medoo\Medoo;
 
 $db = new Medoo(database());
 $settings = settings();
-
+/*
 // Создание корневой категории
 
 $categoryObject = ShopCategoryAdapter::factory()
@@ -43,3 +43,19 @@ do {
     }
     $level++;
 } while(count($categories));
+
+*/
+
+// Импорт товаров
+
+$products = $db->select('sima_products', [
+        '[>]sima_categories' => ['category_id' => 'alien_id'],
+    ],
+    [
+        'sima_products.name', 'sima_products.description', 'sima_products.price',
+        'sima_categories.local_id(category_id)', 'sima_categories.name(ctg)'
+    ]
+);
+
+echo "<pre>";
+var_dump($products);

@@ -28,6 +28,8 @@ $db->create('sima_products', [
     'name' => ['VARCHAR(255)', 'NOT NULL'],
     'description' => ['VARCHAR(255)'],
     'price' => ['FLOAT', 'NOT NULL'],
+    'photos' => ['VARCHAR(255)', 'NULL'],
+    'base_photo_url' => ['VARCHAR(255)', 'NULL'],
 ]);
 
 $db->create('sima_attributes', [

@@ -30,6 +30,8 @@ class ProductAdapter
                 'name' => $product->name,
                 'description' => $product->description,
                 'price' => $product->price,
+                'photos' => json_encode($product->agg_photos),
+                'base_photo_url' => $product->base_photo_url,
             ];
         }
         return $output;
